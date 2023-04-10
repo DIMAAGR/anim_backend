@@ -1,2 +1,3 @@
-A sample command-line application with an entrypoint in `bin/`, library code
-in `lib/`, and example unit test in `test/`.
+### Anime application backend maded in dart
+
+Este projeto utiliza principalmente o shelf com o dart e o hive como DB NoSQL.

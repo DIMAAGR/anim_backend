@@ -4,5 +4,8 @@ class ErrorModel {
 
   ErrorModel({required this.code, required this.message});
 
-  toJson() => {'code' : code, 'message' : message};
+  toJson() => {'code': code, 'message': message};
+
+  @override
+  String toString() => toJson().toString();
 }

@@ -1,4 +1,7 @@
+import 'package:anim_backend/core/constants.dart';
+import 'package:anim_backend/log/log.dart';
 import 'package:anim_backend/shared/data_base/db.dart';
+import 'package:anim_backend/shared/models/error_model.dart';
 import 'package:uuid/uuid.dart';
 
 class UserSession {
@@ -35,7 +38,7 @@ class UserSession {
 
     UserSession session = UserSession.session(
       sessionCode: uuid.v4(),
-      sessionTime: DateTime.now().add(const Duration(hours: 8)).millisecondsSinceEpoch.toString(),
+      sessionTime: DateTime.now().add(const Duration(seconds: Const.sessionDurationTimeInSeconds)).millisecondsSinceEpoch.toString(),
       userID: 'UID',
     );
 
@@ -47,11 +50,39 @@ class UserSession {
     return session;
   }
 
-  getSessionData() {
-    
+  Future<dynamic> getSessionData() async {
+    bool isSessionValid = Uuid.isValidUUID(fromString: _sessionCode ?? 'NULL');
+
+    if (isSessionValid) {
+      Map<dynamic, dynamic>? sessionData = await (await HiveDB.sessionsDB).get(sessionID);
+
+      if (sessionData == null) return ErrorModel(code: '401', message: 'session does not exists, UNAUTHORIZED');
+
+      return UserSession.session(
+        sessionCode: _sessionCode!,
+        sessionTime: sessionData['sessionTime'],
+        userID: sessionData['userID'],
+      );
+    } else {
+      return ErrorModel(code: '401', message: 'invalid session code, UNAUTHORIZED');
+    }
   }
 
   removeSession() {}
 
-  checkSessionTime() {}
+  bool isSessionTimeValid() {
+    String actualTime = DateTime.now().millisecondsSinceEpoch.toString();
+
+    if (int.tryParse(_endtime!) == null) {
+      Log.error('INT_01', 'UserSession CLASS >> the **_endtime** is null');
+      return false;
+    }
+
+    if (int.parse(actualTime) >= int.parse(_endtime!)) {
+      Log.info('EXP_01', 'UserSession CLASS >> the session from $_sessionCode has been expired!');
+      return false;
+    } else {
+      return true;
+    }
+  }
 }

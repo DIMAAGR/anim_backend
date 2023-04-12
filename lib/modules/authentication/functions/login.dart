@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:anim_backend/core/constants.dart';
 import 'package:anim_backend/shared/models/error_model.dart';
 import 'package:anim_backend/shared/session/user_session.dart';
@@ -14,7 +11,7 @@ class Login {
 
       return Response(200, body: onSuccess(userSession.sessionID), headers: Const.jsonContentType);
     } else {
-      return Response(403, body: onError(), headers: Const.jsonContentType);
+      return Response(403, body: onError().toString(), headers: Const.jsonContentType);
     }
   }
 
